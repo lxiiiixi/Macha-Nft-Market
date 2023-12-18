@@ -1,7 +1,7 @@
 import { useState, ChangeEvent } from "react";
 import { parseEther } from "viem";
 import { writeContract } from "@wagmi/core";
-import { CONTRACT_CONFIG, COST } from "@/configs/configs";
+import { CONTRACT_CONFIG, MINT_FEE, TRANSACTION_FEE } from "@/configs/configs";
 import { useAccount } from "wagmi";
 
 // import { create } from "ipfs-http-client";
@@ -25,7 +25,7 @@ function MintPage({
     reloadData: () => void;
     setAlertContent: React.Dispatch<React.SetStateAction<string>>;
 }) {
-    const [title, setTitle] = useState("");
+    const title = "MCDD Crocodile Macha";
     const [price, setPrice] = useState("");
     const [description, setDescription] = useState("");
     const [metadataURI, setMetadataURI] = useState(""); // 最终上传的这个地址
@@ -44,7 +44,7 @@ function MintPage({
                 ...CONTRACT_CONFIG,
                 functionName: "payToMint",
                 args: [title, description, metadataURI, salesPrice],
-                value: parseEther(COST), // mint 最少需要 0.001 eth
+                value: parseEther(MINT_FEE), // mint 最少需要 0.001 eth
                 account: address,
             });
             reloadData();
@@ -110,7 +110,11 @@ function MintPage({
 
     return (
         <div className="h-full flex gap-4">
-            <div className="w-[40%] h-full daisy-skeleton flex justify-center items-center">
+            <div className="relative group w-[40%] h-full daisy-skeleton flex justify-center items-center">
+                <span className="absolute top-4 left-0 px-10 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                    You can only select the picture including the crocodile Macha, otherwise you may
+                    fail to pass the review.
+                </span>
                 {imgBase64 && (
                     <img
                         alt="NFT"
@@ -121,7 +125,7 @@ function MintPage({
             </div>
             <div className="w-[60%] h-full flex justify-center items-center">
                 <div className="w-[70%] flex flex-col justify-start gap-2">
-                    <label className="form-control w-full max-w-xs flex items-end justify-between">
+                    <label className="form-control w-full flex items-end justify-between">
                         <div>
                             <div className="daisy-label">
                                 <span className="daisy-label-text">Pick an image</span>
@@ -144,42 +148,43 @@ function MintPage({
                             Upload To IPFS
                         </button>
                     </label>
-                    <label className="form-control w-full max-w-xs">
+                    <label className="form-control w-full">
                         <div className="daisy-label">
                             <span className="daisy-label-text">MetadataURI</span>
                         </div>
                         <input
                             type="text"
-                            placeholder="Type here"
-                            className="daisy-input daisy-input-bordered w-full max-w-xs"
+                            placeholder="It will be generated automatically by uploading pictures."
+                            className="daisy-input daisy-input-bordered w-full"
                             onChange={e => setMetadataURI(e.target.value)}
                             value={metadataURI}
+                            disabled
                             required
                         />
                     </label>
-                    <label className="form-control w-full max-w-xs">
+                    <label className="form-control w-full">
                         <div className="daisy-label">
                             <span className="daisy-label-text">Title</span>
                         </div>
                         <input
                             type="text"
                             placeholder="Type here"
-                            className="daisy-input daisy-input-bordered w-full max-w-xs"
-                            onChange={e => setTitle(e.target.value)}
+                            className="daisy-input daisy-input-bordered w-full"
+                            // onChange={e => setTitle(e.target.value)}
                             value={title}
                             required
                         />
                     </label>
-                    <label className="form-control w-full max-w-xs">
+                    <label className="form-control w-full">
                         <div className="daisy-label">
                             <span className="daisy-label-text">Price (ETH)</span>
                         </div>
                         <input
                             type="number"
-                            step={0.001}
-                            min={0.001}
-                            placeholder="Type here"
-                            className="daisy-input daisy-input-bordered w-full max-w-xs"
+                            step={0.01}
+                            min={0.01}
+                            placeholder="Others can buy your nft at this price."
+                            className="daisy-input daisy-input-bordered w-full"
                             onChange={e => setPrice(e.target.value)}
                             value={price}
                             required
@@ -191,18 +196,26 @@ function MintPage({
                         </div>
                         <textarea
                             className="daisy-textarea daisy-textarea-bordered w-full"
-                            placeholder="Bio"
+                            placeholder="A short sentence description"
                             onChange={e => setDescription(e.target.value)}
                             value={description}
                             required
                         ></textarea>
                     </label>
                     <p className="text-sm text-gray-600 text-left">
-                        Mint A nft will cost you 0.001 ETH
+                        You will pay {MINT_FEE} ETH as mint fee and {TRANSACTION_FEE} as transaction
+                        execution fee.
                     </p>
-                    <button className="daisy-btn daisy-btn-outline " onClick={submitMint}>
-                        Mint
-                    </button>
+                    <div
+                        className="daisy-tooltip daisy-tooltip-bottom w-full daisy-tooltip::before:w-[300px]"
+                        data-tip={
+                            "Please check the information you are about to upload before submission. If the review fails, the mint fee will be refunded to you, but the execution fee will not be refunded."
+                        }
+                    >
+                        <button className="daisy-btn daisy-btn-outline w-full" onClick={submitMint}>
+                            Submit
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -11,7 +11,7 @@ const displayNft: NFTDataType = {
     metadataURI: Cover,
     owner: "0x037B83c8C7E8169565B8E14C03aeCF1855428de1",
     timestamp: 1702788527n,
-    title: "MCDD Dinosaur Macha",
+    title: "MCDD Crocodile Macha",
 } as const;
 
 function HomePage({
