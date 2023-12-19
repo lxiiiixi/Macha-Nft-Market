@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract TimelessTokens is ERC721Enumerable, Ownable {
+contract TimelessTokens1 is ERC721Enumerable, Ownable {
     using Strings for uint256;
     mapping(string => uint8) existingURIs;
     mapping(uint256 => address) public holderOf;
