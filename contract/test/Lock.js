@@ -1,7 +1,6 @@
 const {
   loadFixture,
 } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
-const { log } = require("console");
 const { upgrades } = require("hardhat")
 
 describe("Lock", function () {

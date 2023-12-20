@@ -21,7 +21,7 @@ module.exports = {
   networks: {
     "base-goerli": {
       url: `https://base-goerli.g.alchemy.com/v2/${process.env.ALCHEMY_API}`,
-      accounts: [process.env.PRIVATE_KEY], // 0x037B83c8C7E8169565B8E14C03aeCF1855428de1
+      accounts: [`0x${process.env.PRIVATE_KEY}`], // 0x037B83c8C7E8169565B8E14C03aeCF1855428de1
       gasPrice: 1000000000,
     }
   },

@@ -1,5 +1,5 @@
 {
-  "name": "bitx_grok_arbitrage",
+  "name": "timeless",
   "packageManager": "yarn@3.6.3",
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
