@@ -9,17 +9,24 @@ function ReviewTable({
     isOwner,
     reviewLists,
     handleSingleMint,
+    handleMultiMint,
+    removeReviewedListByIndex,
+    removeMultipleReviewedListByindices,
 }: {
     isOwner: boolean;
     reviewLists: NFTDataType[];
     handleSingleMint: (id: bigint, metadataURI: string) => void;
+    handleMultiMint: (id: bigint[], metadataURI: string[]) => void;
+    removeReviewedListByIndex: (id: bigint, metadataURI: string) => void;
+    removeMultipleReviewedListByindices: (id: bigint[], metadataURI: string[]) => void;
 }) {
     const defaultCheckedLists = reviewLists.map(item => ({ ...item, checked: true }));
     const defaultNoCheckedLists = reviewLists.map(item => ({ ...item, checked: false }));
     const [displayedReviewLists, setDisplayedReviewLists] =
-        React.useState<DisplayedReviewListType[]>(defaultCheckedLists);
+        React.useState<DisplayedReviewListType[]>(defaultNoCheckedLists);
 
     const ifAllChecked = displayedReviewLists.every(item => item.checked);
+    const ifOneChecked = displayedReviewLists.some(item => item.checked);
 
     const setSingleChecked = (id: bigint, metadataURI: string, checked: boolean) => {
         setDisplayedReviewLists(
@@ -32,6 +39,24 @@ function ReviewTable({
         );
     };
     console.log(displayedReviewLists);
+
+    const filterCheckedIdAndMetadataURI = () => {
+        const idList = displayedReviewLists.filter(item => item.checked).map(item => item.id);
+        const metadataURIList = displayedReviewLists
+            .filter(item => item.checked)
+            .map(item => item.metadataURI);
+        return { idList, metadataURIList };
+    };
+
+    const handleCheckedMultiMint = () => {
+        const { idList, metadataURIList } = filterCheckedIdAndMetadataURI();
+        handleMultiMint(idList, metadataURIList);
+    };
+
+    const handleCheckedMultiCancel = () => {
+        const { idList, metadataURIList } = filterCheckedIdAndMetadataURI();
+        removeMultipleReviewedListByindices(idList, metadataURIList);
+    };
 
     return (
         <div className="w-full">
@@ -107,6 +132,13 @@ function ReviewTable({
                                 <td>{timestampToDate(timestamp)}</td>
                                 <th>
                                     <button
+                                        className="daisy-btn daisy-btn-ghost daisy-btn-xs mr-1"
+                                        disabled={!isOwner}
+                                        onClick={() => removeReviewedListByIndex(id, metadataURI)}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
                                         className="daisy-btn daisy-btn-ghost daisy-btn-xs"
                                         disabled={!isOwner}
                                         onClick={() => handleSingleMint(id, metadataURI)}
@@ -122,12 +154,20 @@ function ReviewTable({
                 <tfoot>
                     <tr>
                         <th>
-                            <button className="daisy-btn daisy-btn-sm" disabled={!isOwner}>
+                            <button
+                                className="daisy-btn daisy-btn-sm"
+                                disabled={!isOwner || !ifOneChecked}
+                                onClick={handleCheckedMultiMint}
+                            >
                                 Mint
                             </button>
                         </th>
                         <th>
-                            <button className="daisy-btn daisy-btn-sm" disabled={!isOwner}>
+                            <button
+                                className="daisy-btn daisy-btn-sm"
+                                disabled={!isOwner || !ifOneChecked}
+                                onClick={handleCheckedMultiCancel}
+                            >
                                 Cancel
                             </button>
                         </th>

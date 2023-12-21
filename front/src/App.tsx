@@ -25,7 +25,7 @@ export type NFTDataType = {
 };
 export type TransactionStructType = {
     id: bigint;
-    transactionType: "Buy" | "Mint";
+    transactionType: 0 | 1; // 0: buy, 1: mint
     from: AddressType;
     to: AddressType;
     cost: bigint;
@@ -71,9 +71,10 @@ function App() {
             ],
         });
 
-        setAllNfts(data[1].result as NFTDataType[]);
-        setAllTransactions(data[2].result as TransactionStructType[]);
-        setAllReviewLists(data[3].result as NFTDataType[]);
+        if (data[1].status === "success") setAllNfts(data[1].result as NFTDataType[]);
+        if (data[2].status === "success")
+            setAllTransactions(data[2].result as TransactionStructType[]);
+        if (data[3].status === "success") setAllReviewLists(data[3].result as NFTDataType[]);
     };
 
     useEffect(() => {

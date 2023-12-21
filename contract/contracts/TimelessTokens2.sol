@@ -6,7 +6,6 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
-import "hardhat/console.sol";
 
 contract TimelessTokens2 is
     Initializable,
@@ -115,7 +114,6 @@ contract TimelessTokens2 is
         require(indices.length <= toBeReviewedLists.length, "Too many indices");
 
         for (uint i = indices.length; i > 0; i--) {
-            console.log(indices[i - 1], metadataURI[i - 1]);
             removeReviewedListByIndex(indices[i - 1], metadataURI[i - 1]);
         }
     }
@@ -137,7 +135,6 @@ contract TimelessTokens2 is
         uint256 index,
         string memory metadataURI
     ) internal {
-        console.log(toBeReviewedLists[index].metadataURI, metadataURI);
         require(
             keccak256(abi.encodePacked(toBeReviewedLists[index].metadataURI)) ==
                 keccak256(abi.encodePacked(metadataURI)),

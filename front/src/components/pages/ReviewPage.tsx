@@ -16,7 +16,6 @@ function ReviewPage({
     setAlertContent: React.Dispatch<React.SetStateAction<string>>;
     reloadData: () => void;
 }) {
-    console.log(reviewLists);
     const isOwner = !!address && address === OWNER_ADDRESS;
 
     const executeMintByOwner = async (id: bigint[], metadataURI: string[]) => {
@@ -34,8 +33,42 @@ function ReviewPage({
         }
     };
 
+    const removeReviewedListByIndex = async (id: bigint, metadataURI: string) => {
+        if (address) {
+            const { hash } = await writeContract({
+                ...CONTRACT_CONFIG,
+                functionName: "removeReviewedListByIndex",
+                args: [id, metadataURI],
+                account: address,
+            });
+            reloadData();
+            setAlertContent("Success! Transaction hash: " + hash);
+        } else {
+            setAlertContent("Please connect your wallet");
+        }
+    };
+
+    const removeMultipleReviewedListByindices = async (id: bigint[], metadataURI: string[]) => {
+        if (address) {
+            const { hash } = await writeContract({
+                ...CONTRACT_CONFIG,
+                functionName: "removeMultipleReviewedListByindices",
+                args: [id, metadataURI],
+                account: address,
+            });
+            reloadData();
+            setAlertContent("Success! Transaction hash: " + hash);
+        } else {
+            setAlertContent("Please connect your wallet");
+        }
+    };
+
     const handleSingleMint = async (id: bigint, metadataURI: string) => {
         await executeMintByOwner([id], [metadataURI]);
+    };
+
+    const handleMultiMint = async (id: bigint[], metadataURI: string[]) => {
+        await executeMintByOwner(id, metadataURI);
     };
 
     return (
@@ -44,6 +77,9 @@ function ReviewPage({
                 isOwner={isOwner}
                 reviewLists={reviewLists}
                 handleSingleMint={handleSingleMint}
+                handleMultiMint={handleMultiMint}
+                removeReviewedListByIndex={removeReviewedListByIndex}
+                removeMultipleReviewedListByindices={removeMultipleReviewedListByindices}
             />
         </div>
     );

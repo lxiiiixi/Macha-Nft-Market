@@ -892,6 +892,11 @@
                 "internalType": "uint256[]",
                 "name": "indices",
                 "type": "uint256[]"
+            },
+            {
+                "internalType": "string[]",
+                "name": "metadataURI",
+                "type": "string[]"
             }
         ],
         "name": "removeMultipleReviewedListByindices",
@@ -905,6 +910,11 @@
                 "internalType": "uint256",
                 "name": "index",
                 "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "metadataURI",
+                "type": "string"
             }
         ],
         "name": "removeReviewedListByIndex",

@@ -3,7 +3,7 @@ import type { TransactionStructType } from "@/App";
 import { formatEther } from "viem";
 
 function TansactionTable({ allTransactions }: { allTransactions: TransactionStructType[] }) {
-    console.log(allTransactions);
+    // console.log(allTransactions);
 
     return (
         <div className="overflow-x-auto">
@@ -11,7 +11,8 @@ function TansactionTable({ allTransactions }: { allTransactions: TransactionStru
                 {/* head */}
                 <thead>
                     <tr>
-                        <th>Trasaction Id</th>
+                        <th>Id</th>
+                        <th>Type</th>
                         <th>Time</th>
                         <th>From</th>
                         <th>To</th>
@@ -22,6 +23,7 @@ function TansactionTable({ allTransactions }: { allTransactions: TransactionStru
                     {allTransactions.map(transaction => (
                         <tr key={transaction.id.toString()}>
                             <td>{transaction.id.toString()}</td>
+                            <td>{transaction.transactionType === 1 ? "Mint" : "Buy"}</td>
                             <td>{timestampToDate(transaction.timestamp)}</td>
                             <td>{shortAddress(transaction.from)}</td>
                             <td>{shortAddress(transaction.to)}</td>
