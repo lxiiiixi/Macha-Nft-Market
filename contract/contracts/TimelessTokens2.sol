@@ -9,6 +9,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721Enumer
 import "hardhat/console.sol";
 
 contract TimelessTokens2 is
+    Initializable,
     UUPSUpgradeable,
     OwnableUpgradeable,
     ERC721EnumerableUpgradeable

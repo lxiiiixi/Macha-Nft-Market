@@ -1,22 +1,8 @@
 import { useState, ChangeEvent } from "react";
 import { parseEther } from "viem";
 import { writeContract } from "@wagmi/core";
-import { CONTRACT_CONFIG, MINT_FEE, TRANSACTION_FEE } from "@/configs/configs";
+import { CONTRACT_CONFIG, MINT_FEE, TRANSACTION_FEE, OWNER_ADDRESS } from "@/configs/configs";
 import { useAccount } from "wagmi";
-
-// import { create } from "ipfs-http-client";
-// const auth = "Basic " + btoa(INFURIA_PID + ":" + INFURIA_API);
-// const client = create({
-//     host: "ipfs.infura.io",
-//     port: 5001,
-//     protocol: "https",
-//     headers: {
-//         authorization: auth,
-//     },
-// });
-
-// 81ae8013770233d
-// d85674cbcd7415319f9b540e4ab958249999d5f4
 
 function MintPage({
     reloadData,
@@ -26,12 +12,14 @@ function MintPage({
     setAlertContent: React.Dispatch<React.SetStateAction<string>>;
 }) {
     const title = "MCDD Crocodile Macha";
+    const [isSubmiting, setIsSubmiting] = useState(false);
     const [price, setPrice] = useState("");
     const [description, setDescription] = useState("");
     const [metadataURI, setMetadataURI] = useState(""); // 最终上传的这个地址
     const [fileUrl, setFileUrl] = useState<File>(); // 要上传到服务器的图片
     const [imgBase64, setImgBase64] = useState<null | string>(null); // base64(display)
     const { address } = useAccount();
+    const isOwner = !!address && address === OWNER_ADDRESS;
 
     const submitMintNFT = async (
         title: string,
@@ -39,34 +27,56 @@ function MintPage({
         metadataURI: string,
         salesPrice: bigint
     ) => {
-        if (address) {
-            const { hash } = await writeContract({
-                ...CONTRACT_CONFIG,
-                functionName: "submitTobeReviewedList",
-                args: [title, description, metadataURI, salesPrice],
-                value: parseEther(MINT_FEE) + parseEther(TRANSACTION_FEE), // mint 最少需要 0.001 eth
-                account: address,
-            });
-            reloadData();
-            setAlertContent("Success! Transaction hash: " + hash);
-        } else {
-            setAlertContent("Please connect your wallet");
-        }
+        const { hash } = await writeContract({
+            ...CONTRACT_CONFIG,
+            functionName: "submitTobeReviewedList",
+            args: [title, description, metadataURI, salesPrice],
+            value: parseEther(MINT_FEE) + parseEther(TRANSACTION_FEE), // mint 最少需要 0.001 eth
+            account: address,
+        });
+        reloadData();
+        setAlertContent("Success! Transaction hash: " + hash);
+    };
+
+    const mintByOwner = async (
+        title: string,
+        description: string,
+        metadataURI: string,
+        salesPrice: bigint
+    ) => {
+        const { hash } = await writeContract({
+            ...CONTRACT_CONFIG,
+            functionName: "mintByOwner",
+            args: [title, description, metadataURI, salesPrice],
+            value: parseEther(MINT_FEE),
+            account: address,
+        });
+        reloadData();
+        setAlertContent("Success! Transaction hash: " + hash);
     };
 
     const submitMint = () => {
-        if (!title || !price || !description || !metadataURI) {
-            setAlertContent("Please fill in the complete information");
-            return;
+        if (address) {
+            if (!title || !price || !description || !metadataURI) {
+                setAlertContent("Please fill in the complete information");
+                return;
+            } else {
+                setIsSubmiting(true);
+                if (isOwner) {
+                    mintByOwner(title, description, metadataURI, parseEther(price));
+                } else {
+                    submitMintNFT(title, description, metadataURI, parseEther(price));
+                }
+                setIsSubmiting(false);
+            }
         } else {
-            submitMintNFT(title, description, metadataURI, parseEther(price));
+            setAlertContent("Please connect your wallet");
         }
     };
 
     const changeImage = async (e: ChangeEvent<HTMLInputElement>) => {
         const reader = new FileReader();
         const targetFile = e.target.files![0];
-        console.log(targetFile);
 
         if (targetFile) reader.readAsDataURL(targetFile);
 
@@ -171,7 +181,8 @@ function MintPage({
                             placeholder="Type here"
                             className="daisy-input daisy-input-bordered w-full"
                             // onChange={e => setTitle(e.target.value)}
-                            value={title}
+                            defaultValue={title}
+                            readOnly
                             required
                         />
                     </label>
@@ -213,7 +224,14 @@ function MintPage({
                         }
                     >
                         <button className="daisy-btn daisy-btn-outline w-full" onClick={submitMint}>
-                            Submit
+                            {isSubmiting ? (
+                                <div className="relative">
+                                    Submitting
+                                    <span className="daisy-loading daisy-loading-dots daisy-loading-xs absolute -bottom-1 -right-5"></span>
+                                </div>
+                            ) : (
+                                "Submit"
+                            )}
                         </button>
                     </div>
                 </div>

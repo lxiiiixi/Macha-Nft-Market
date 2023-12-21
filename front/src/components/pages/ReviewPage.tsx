@@ -9,10 +9,12 @@ function ReviewPage({
     reviewLists,
     address,
     setAlertContent,
+    reloadData,
 }: {
     reviewLists: NFTDataType[];
     address: AddressType | undefined;
     setAlertContent: React.Dispatch<React.SetStateAction<string>>;
+    reloadData: () => void;
 }) {
     console.log(reviewLists);
     const isOwner = !!address && address === OWNER_ADDRESS;
@@ -25,7 +27,7 @@ function ReviewPage({
                 args: [id, metadataURI],
                 account: address,
             });
-            // reloadData();
+            reloadData();
             setAlertContent("Success! Transaction hash: " + hash);
         } else {
             setAlertContent("Please connect your wallet");

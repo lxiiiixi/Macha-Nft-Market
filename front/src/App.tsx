@@ -105,6 +105,7 @@ function App() {
                         reviewLists={allReviewLists}
                         address={address}
                         setAlertContent={setAlertContent}
+                        reloadData={reloadData}
                     />
                 )}
                 {route === "LISTED" && (
