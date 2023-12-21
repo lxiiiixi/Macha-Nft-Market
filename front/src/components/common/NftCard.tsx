@@ -76,9 +76,9 @@ function NftCard({
             </figure>
             <div className="daisy-card-body p-4">
                 <h2 className="daisy-card-title flex justify-between">
-                    <div className="flex justify-center items-center">
-                        {title}
-                        <div className="daisy-badge bg-[#7A9B57] text-white ml-2">{`#${id}`}</div>
+                    <div className="flex justify-start items-center">
+                        <span className="text-md text-left"> {title} </span>
+                        <div className="daisy-badge bg-[#7A9B57] text-white ml-1">{`#${id}`}</div>
                     </div>
                     {!isHome && (
                         <div

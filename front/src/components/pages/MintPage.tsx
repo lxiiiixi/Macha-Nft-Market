@@ -33,7 +33,7 @@ function MintPage({
     const [imgBase64, setImgBase64] = useState<null | string>(null); // base64(display)
     const { address } = useAccount();
 
-    const mintNFT = async (
+    const submitMintNFT = async (
         title: string,
         description: string,
         metadataURI: string,
@@ -42,9 +42,9 @@ function MintPage({
         if (address) {
             const { hash } = await writeContract({
                 ...CONTRACT_CONFIG,
-                functionName: "payToMint",
+                functionName: "submitTobeReviewedList",
                 args: [title, description, metadataURI, salesPrice],
-                value: parseEther(MINT_FEE), // mint 最少需要 0.001 eth
+                value: parseEther(MINT_FEE) + parseEther(TRANSACTION_FEE), // mint 最少需要 0.001 eth
                 account: address,
             });
             reloadData();
@@ -59,7 +59,7 @@ function MintPage({
             setAlertContent("Please fill in the complete information");
             return;
         } else {
-            mintNFT(title, description, metadataURI, parseEther(price));
+            submitMintNFT(title, description, metadataURI, parseEther(price));
         }
     };
 
@@ -158,7 +158,7 @@ function MintPage({
                             className="daisy-input daisy-input-bordered w-full"
                             onChange={e => setMetadataURI(e.target.value)}
                             value={metadataURI}
-                            disabled
+                            // disabled
                             required
                         />
                     </label>

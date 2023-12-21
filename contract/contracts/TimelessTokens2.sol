@@ -6,15 +6,11 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
-
-// import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-// import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-// import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 
 contract TimelessTokens2 is
-    Initializable,
-    OwnableUpgradeable,
     UUPSUpgradeable,
+    OwnableUpgradeable,
     ERC721EnumerableUpgradeable
 {
     using Strings for uint256;
@@ -86,18 +82,6 @@ contract TimelessTokens2 is
         address newImplementation
     ) internal override onlyOwner {}
 
-    // constructor(
-    //     string memory _name,
-    //     string memory _symbol,
-    //     uint256 _royalityFeeRate,
-    //     address _artist,
-    //     address _initialOwner
-    // ) ERC721(_name, _symbol) {
-    //     royalityFeeRate = _royalityFeeRate;
-    //     artist = _artist;
-    //      _disableInitializers();
-    // }
-
     function submitTobeReviewedList(
         string memory title,
         string memory description,
@@ -124,36 +108,45 @@ contract TimelessTokens2 is
     }
 
     function removeMultipleReviewedListByindices(
-        uint256[] memory indices
+        uint256[] memory indices,
+        string[] memory metadataURI
     ) public {
         require(indices.length <= toBeReviewedLists.length, "Too many indices");
 
-        for (uint i = 0; i < indices.length; i++) {
-            require(
-                indices[i] < toBeReviewedLists.length,
-                "Index out of bounds"
-            );
-            _removeReviewedListByIndex(i);
+        for (uint i = indices.length; i > 0; i--) {
+            console.log(indices[i - 1], metadataURI[i - 1]);
+            removeReviewedListByIndex(indices[i - 1], metadataURI[i - 1]);
         }
     }
 
-    function removeReviewedListByIndex(uint256 index) public {
+    function removeReviewedListByIndex(
+        uint256 index,
+        string memory metadataURI
+    ) public {
         address submitOwner = toBeReviewedLists[index].owner;
         require(
             msg.sender == owner() || msg.sender == submitOwner,
             "Not allowed!"
         );
-        _removeReviewedListByIndex(index);
+        _removeReviewedListByIndex(index, metadataURI);
+        payTo(submitOwner, mintFee + executionFee);
     }
 
-    function _removeReviewedListByIndex(uint256 index) internal {
+    function _removeReviewedListByIndex(
+        uint256 index,
+        string memory metadataURI
+    ) internal {
+        console.log(toBeReviewedLists[index].metadataURI, metadataURI);
+        require(
+            keccak256(abi.encodePacked(toBeReviewedLists[index].metadataURI)) ==
+                keccak256(abi.encodePacked(metadataURI)),
+            "Wrong URI"
+        );
         require(index < toBeReviewedLists.length, "Index out of bounds");
-        address _owner = toBeReviewedLists[index].owner;
         toBeReviewedLists[index] = toBeReviewedLists[
             toBeReviewedLists.length - 1
         ];
         toBeReviewedLists.pop();
-        payTo(_owner, mintFee + executionFee);
     }
 
     function executeMintByOwner(
@@ -162,18 +155,24 @@ contract TimelessTokens2 is
     ) external onlyOwner {
         require(id.length <= toBeReviewedLists.length, "Index out of bounds");
 
-        uint256 royaltyFees = (id.length * royalityFeeRate) / 100;
-        uint256 mintFees = id.length * mintFee - royaltyFees;
+        uint fees = id.length * mintFee;
+        uint256 royaltyFees = (fees * royalityFeeRate) / 100;
+        uint256 mintFees = fees - royaltyFees;
+        uint256 executeFees = id.length * executionFee;
+
         require(
             address(this).balance >= royaltyFees + mintFees,
             "Not enough ETH to execute mint!"
         );
 
-        for (uint i = 0; i < id.length; i++) {
-            NFTStruct memory nftData = toBeReviewedLists[i];
-            require(i < toBeReviewedLists.length, "Index out of bounds");
+        for (uint i = id.length; i > 0; i--) {
             require(
-                keccak256(abi.encodePacked(metadataURI[i])) ==
+                id[i - 1] < toBeReviewedLists.length,
+                "Index out of bounds"
+            );
+            NFTStruct memory nftData = toBeReviewedLists[id[i - 1]];
+            require(
+                keccak256(abi.encodePacked(metadataURI[i - 1])) ==
                     keccak256(abi.encodePacked(nftData.metadataURI)),
                 "Invalid metadataURI!"
             );
@@ -185,11 +184,11 @@ contract TimelessTokens2 is
                 nftData.metadataURI,
                 nftData.cost
             );
+            _removeReviewedListByIndex(id[i - 1], metadataURI[i - 1]);
         }
-        removeMultipleReviewedListByindices(id);
 
         payTo(artist, royaltyFees);
-        payTo(owner(), mintFees);
+        payTo(owner(), mintFees + executeFees);
     }
 
     function mintByOwner(
@@ -294,15 +293,16 @@ contract TimelessTokens2 is
     }
 
     function withdrawEth(uint amount) external onlyOwner {
-        require(address(this).balance > 0, "No ETH to withdraw");
+        uint balance = address(this).balance;
+        require(balance > 0, "No ETH to withdraw");
         require(amount > 0, "Amount must be greater than 0");
-        require(address(this).balance >= amount, "Not enough ETH to withdraw");
+        require(balance >= amount, "Not enough ETH to withdraw");
 
         uint256 bufferAmount = toBeReviewedLists.length *
             (mintFee + executionFee); // need to reserve a guarantee to execute mint or return it to the user
 
         require(
-            amount < bufferAmount,
+            amount <= balance - bufferAmount,
             "There will be insufficient funds to review the list of transactions."
         );
 

@@ -36,9 +36,8 @@ function ListedPage({
         <div className="hidden-scrollbar grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full h-full overflow-y-scroll overflow-x-hidden">
             {allNfts.length > 0 &&
                 allNfts.map(nft => (
-                    <div className="h-[500px]">
+                    <div className="h-[500px]" key={nft.id}>
                         <NftCard
-                            key={nft.id}
                             isHome={false}
                             data={nft}
                             address={address}

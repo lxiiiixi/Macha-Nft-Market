@@ -12,7 +12,7 @@ function Navbar({
     const NavList = () => {
         return (
             <>
-                {["Home", "Mint", "Listed"].map(item => (
+                {["Home", "Mint", "Review", "Listed"].map(item => (
                     <li
                         key={item}
                         className={`${route === item.toLocaleUpperCase() ? "font-bold" : ""}`}

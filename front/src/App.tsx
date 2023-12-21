@@ -8,27 +8,27 @@ import Navbar from "@/components/Navbar.tsx";
 import HomePage from "@/components/pages/HomePage";
 import MintPage from "@/components/pages/MintPage";
 import ListedPage from "@/components/pages/ListedPage";
+import ReviewPage from "@/components/pages/ReviewPage";
 import Alert from "@/components/common/Alert";
 import useAlert from "./hooks/useAlert";
 
 export type AddressType = `0x${string}`;
-export type RouteType = "HOME" | "MINT" | "LISTED";
+export type RouteType = "HOME" | "MINT" | "REVIEW" | "LISTED";
 export type NFTDataType = {
     cost: bigint;
     description: string;
     id: bigint;
     metadataURI: string;
-    owner: string;
+    owner: AddressType;
     timestamp: bigint;
     title: string;
 };
 export type TransactionStructType = {
     id: bigint;
-    from: string;
-    to: string;
+    transactionType: "Buy" | "Mint";
+    from: AddressType;
+    to: AddressType;
     cost: bigint;
-    title: string;
-    metadataURI: string;
     timestamp: bigint;
 };
 
@@ -39,9 +39,11 @@ function App() {
     const [alertContent, setAlertContent] = useAlert();
     const [allNfts, setAllNfts] = useState<NFTDataType[]>([]);
     const [allTransactions, setAllTransactions] = useState<TransactionStructType[]>([]);
+    const [allReviewLists, setAllReviewLists] = useState<NFTDataType[]>([]);
 
     console.log("allNfts:", allNfts);
     console.log("AllTransactions", allTransactions);
+    console.log("allReviewLists", allReviewLists);
 
     const switchRoute = (route: RouteType) => {
         setRouter(route);
@@ -62,11 +64,16 @@ function App() {
                     ...CONTRACT_CONFIG,
                     functionName: "getAllTransactions",
                 },
+                {
+                    ...CONTRACT_CONFIG,
+                    functionName: "getAllToBeReviewLists",
+                },
             ],
         });
 
         setAllNfts(data[1].result as NFTDataType[]);
         setAllTransactions(data[2].result as TransactionStructType[]);
+        setAllReviewLists(data[3].result as NFTDataType[]);
     };
 
     useEffect(() => {
@@ -92,6 +99,13 @@ function App() {
                 )}
                 {route === "MINT" && (
                     <MintPage reloadData={reloadData} setAlertContent={setAlertContent} />
+                )}
+                {route === "REVIEW" && (
+                    <ReviewPage
+                        reviewLists={allReviewLists}
+                        address={address}
+                        setAlertContent={setAlertContent}
+                    />
                 )}
                 {route === "LISTED" && (
                     <ListedPage allNfts={allNfts} address={address} reloadData={reloadData} />

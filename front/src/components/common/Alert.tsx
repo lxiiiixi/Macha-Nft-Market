@@ -2,7 +2,7 @@ function Alert({ content }: { content: string }) {
     return (
         <div
             role="alert"
-            className={`daisy-alert absolute bottom-6 left-6 min-w-1/2 max-w-[80%] ${
+            className={`daisy-alert absolute bottom-6 left-6 w-fit max-w-[80%] ${
                 content.length !== 0 ? "alert-enter" : "alert-exit"
             }`}
         >
