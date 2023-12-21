@@ -3,6 +3,8 @@ import type { NFTDataType } from "@/App";
 import { shortAddress, timestampToDate } from "@/configs/utils";
 import { formatEther } from "viem";
 
+type DisplayedReviewListType = NFTDataType & { checked: boolean };
+
 function ReviewTable({
     isOwner,
     reviewLists,
@@ -12,6 +14,25 @@ function ReviewTable({
     reviewLists: NFTDataType[];
     handleSingleMint: (id: bigint, metadataURI: string) => void;
 }) {
+    const defaultCheckedLists = reviewLists.map(item => ({ ...item, checked: true }));
+    const defaultNoCheckedLists = reviewLists.map(item => ({ ...item, checked: false }));
+    const [displayedReviewLists, setDisplayedReviewLists] =
+        React.useState<DisplayedReviewListType[]>(defaultCheckedLists);
+
+    const ifAllChecked = displayedReviewLists.every(item => item.checked);
+
+    const setSingleChecked = (id: bigint, metadataURI: string, checked: boolean) => {
+        setDisplayedReviewLists(
+            displayedReviewLists.map(item => {
+                if (id === item.id && item.metadataURI === metadataURI) {
+                    return { ...item, checked };
+                }
+                return item;
+            })
+        );
+    };
+    console.log(displayedReviewLists);
+
     return (
         <div className="w-full">
             <table className="daisy-table">
@@ -20,7 +41,18 @@ function ReviewTable({
                     <tr>
                         <th>
                             <label>
-                                <input type="checkbox" className="daisy-checkbox" />
+                                <input
+                                    type="checkbox"
+                                    className="daisy-checkbox"
+                                    checked={ifAllChecked}
+                                    onChange={e => {
+                                        if (e.target.checked) {
+                                            setDisplayedReviewLists(defaultCheckedLists);
+                                        } else {
+                                            setDisplayedReviewLists(defaultNoCheckedLists);
+                                        }
+                                    }}
+                                />
                             </label>
                         </th>
                         <th>Meta</th>
@@ -32,9 +64,17 @@ function ReviewTable({
                 </thead>
                 <tbody>
                     {/* row 1 */}
-                    {reviewLists.map(item => {
-                        const { id, metadataURI, title, description, owner, timestamp, cost } =
-                            item;
+                    {displayedReviewLists.map(item => {
+                        const {
+                            id,
+                            metadataURI,
+                            title,
+                            description,
+                            owner,
+                            timestamp,
+                            cost,
+                            checked,
+                        } = item;
                         return (
                             <tr key={id}>
                                 <th>
@@ -42,8 +82,9 @@ function ReviewTable({
                                         <input
                                             type="checkbox"
                                             className="daisy-checkbox"
+                                            checked={checked}
                                             onChange={e => {
-                                                console.log(e.target.checked);
+                                                setSingleChecked(id, metadataURI, e.target.checked);
                                             }}
                                         />
                                     </label>

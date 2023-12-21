@@ -17,3 +17,8 @@ export const INFURIA_API = import.meta.env.VITE_INFURIA_API;
 if (typeof INFURIA_API === "undefined") {
     throw new Error("Please provide INFURIA_API in .env");
 }
+
+export const IMGBB_API = import.meta.env.VITE_IMGBB_API;
+if (typeof INFURIA_API === "undefined") {
+    throw new Error("Please provide IMGBB_API in .env");
+}

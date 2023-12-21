@@ -3,6 +3,7 @@ import { parseEther } from "viem";
 import { writeContract } from "@wagmi/core";
 import { CONTRACT_CONFIG, MINT_FEE, TRANSACTION_FEE, OWNER_ADDRESS } from "@/configs/configs";
 import { useAccount } from "wagmi";
+import { IMGBB_API } from "@/configs/envs";
 
 function MintPage({
     reloadData,
@@ -89,20 +90,13 @@ function MintPage({
 
     const uploadToIpfs = async () => {
         const formData = new FormData();
-
         if (fileUrl) {
-            // formData.append("key", "0f45e2d1368079f611fc10905c208c7b"); // Replace with your Imgbb API key
-            // formData.append("image", imgBase64.replace("data:", "").replace(/^.+,/, ""));
             formData.append("image", fileUrl);
-
             try {
-                const response = await fetch(
-                    "https://api.imgbb.com/1/upload?key=" + "0f45e2d1368079f611fc10905c208c7b",
-                    {
-                        method: "POST",
-                        body: formData,
-                    }
-                );
+                const response = await fetch("https://api.imgbb.com/1/upload?key=" + IMGBB_API, {
+                    method: "POST",
+                    body: formData,
+                });
                 if (response.ok) {
                     const data = await response.json();
                     const displayUrl = data.data.display_url;
