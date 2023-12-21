@@ -131,20 +131,29 @@ function ReviewTable({
                                 <td>{formatEther(cost)} ETH</td>
                                 <td>{timestampToDate(timestamp)}</td>
                                 <th>
-                                    <button
-                                        className="daisy-btn daisy-btn-ghost daisy-btn-xs mr-1"
-                                        disabled={!isOwner}
-                                        onClick={() => removeReviewedListByIndex(id, metadataURI)}
+                                    <div
+                                        className={
+                                            isOwner ? "" : "daisy-tooltip daisy-tooltip-left"
+                                        }
+                                        data-tip={isOwner ? "" : "Only owner can operate"}
                                     >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        className="daisy-btn daisy-btn-ghost daisy-btn-xs"
-                                        disabled={!isOwner}
-                                        onClick={() => handleSingleMint(id, metadataURI)}
-                                    >
-                                        Mint
-                                    </button>
+                                        <button
+                                            className="daisy-btn daisy-btn-ghost daisy-btn-xs mr-1"
+                                            disabled={!isOwner}
+                                            onClick={() =>
+                                                removeReviewedListByIndex(id, metadataURI)
+                                            }
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            className="daisy-btn daisy-btn-ghost daisy-btn-xs"
+                                            disabled={!isOwner}
+                                            onClick={() => handleSingleMint(id, metadataURI)}
+                                        >
+                                            Mint
+                                        </button>
+                                    </div>
                                 </th>
                             </tr>
                         );
@@ -154,23 +163,27 @@ function ReviewTable({
                 <tfoot>
                     <tr>
                         <th>
-                            <button
-                                className="daisy-btn daisy-btn-sm"
-                                disabled={!isOwner || !ifOneChecked}
-                                onClick={handleCheckedMultiMint}
+                            <div
+                                className={isOwner ? "" : "daisy-tooltip daisy-tooltip-right"}
+                                data-tip={isOwner ? "" : "Only owner can operate"}
                             >
-                                Mint
-                            </button>
+                                <button
+                                    className="daisy-btn daisy-btn-sm mr-2"
+                                    disabled={!isOwner || !ifOneChecked}
+                                    onClick={handleCheckedMultiMint}
+                                >
+                                    Mint
+                                </button>
+                                <button
+                                    className="daisy-btn daisy-btn-sm"
+                                    disabled={!isOwner || !ifOneChecked}
+                                    onClick={handleCheckedMultiCancel}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </th>
-                        <th>
-                            <button
-                                className="daisy-btn daisy-btn-sm"
-                                disabled={!isOwner || !ifOneChecked}
-                                onClick={handleCheckedMultiCancel}
-                            >
-                                Cancel
-                            </button>
-                        </th>
+                        <th></th>
                     </tr>
                 </tfoot>
             </table>

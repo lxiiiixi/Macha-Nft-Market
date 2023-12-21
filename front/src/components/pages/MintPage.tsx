@@ -114,7 +114,7 @@ function MintPage({
 
     return (
         <div className="h-full flex gap-4">
-            <div className="relative group w-[40%] h-full daisy-skeleton flex justify-center items-center">
+            <div className="relative group w-[40%] h-full daisy-skeleton flex justify-center items-center m-2">
                 <span className="absolute top-4 left-0 px-10 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
                     You can only select the picture including the crocodile Macha, otherwise you may
                     fail to pass the review.
