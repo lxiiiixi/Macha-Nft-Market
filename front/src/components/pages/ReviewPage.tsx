@@ -9,12 +9,10 @@ function ReviewPage({
     reviewLists,
     address,
     setAlertContent,
-    reloadData,
 }: {
     reviewLists: NFTDataType[];
     address: AddressType | undefined;
     setAlertContent: React.Dispatch<React.SetStateAction<ReactNode>>;
-    reloadData: () => void;
 }) {
     const isOwner = !!address && address === OWNER_ADDRESS;
     const { data: data1, write: writeExecuteMintByOwner } = useContractWrite({
@@ -80,7 +78,6 @@ function ReviewPage({
             writeRemoveMultipleReviewedListByindices({
                 args: [id, metadataURI],
             });
-            reloadData();
             setAlertContent("Success! Transaction hash: " + data3);
         } else {
             setAlertContent("Please connect your wallet");

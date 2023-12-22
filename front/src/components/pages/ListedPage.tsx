@@ -8,11 +8,9 @@ import { parseEther } from "viem";
 function ListedPage({
     allNfts,
     address,
-    reloadData,
 }: {
     allNfts: NFTDataType[];
     address: AddressType | undefined;
-    reloadData: () => void;
 }) {
     const [newPrice, setNewPrice] = React.useState("");
     const [changePriceNftInfo, setChangePriceNftInfo] = React.useState<NFTDataType | null>();
@@ -30,7 +28,6 @@ function ListedPage({
             });
             console.log(data);
             setNewPrice("");
-            reloadData();
         }
     };
 

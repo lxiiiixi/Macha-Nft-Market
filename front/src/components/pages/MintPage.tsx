@@ -6,10 +6,8 @@ import { useAccount } from "wagmi";
 import { IMGBB_API } from "@/configs/envs";
 
 function MintPage({
-    reloadData,
     setAlertContent,
 }: {
-    reloadData: () => void;
     setAlertContent: React.Dispatch<React.SetStateAction<ReactNode>>;
 }) {
     const title = "MCDD Crocodile Macha";
@@ -57,7 +55,6 @@ function MintPage({
         //     value: parseEther(MINT_FEE) + parseEther(TRANSACTION_FEE), // mint 最少需要 0.001 eth
         //     account: address,
         // });
-        reloadData();
         setAlertContent("Success!" + data1);
     };
 
@@ -71,7 +68,6 @@ function MintPage({
             args: [title, description, metadataURI, salesPrice],
             value: parseEther(MINT_FEE),
         });
-        reloadData();
         setAlertContent("Success!" + data2);
         // setAlertContent("Success! Transaction hash: " + hash);
     };
