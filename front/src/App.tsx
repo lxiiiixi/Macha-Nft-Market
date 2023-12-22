@@ -11,6 +11,7 @@ import ListedPage from "@/components/pages/ListedPage";
 import ReviewPage from "@/components/pages/ReviewPage";
 import Alert from "@/components/common/Alert";
 import useAlert from "./hooks/useAlert";
+import { useContractReads } from "wagmi";
 
 export type AddressType = `0x${string}`;
 export type RouteType = "HOME" | "MINT" | "REVIEW" | "LISTED";
@@ -37,9 +38,37 @@ function App() {
     const [count, setCount] = useState(0);
     const [route, setRouter] = useState<RouteType>("HOME");
     const [alertContent, setAlertContent] = useAlert();
-    const [allNfts, setAllNfts] = useState<NFTDataType[]>([]);
-    const [allTransactions, setAllTransactions] = useState<TransactionStructType[]>([]);
-    const [allReviewLists, setAllReviewLists] = useState<NFTDataType[]>([]);
+    // const [allNfts, setAllNfts] = useState<NFTDataType[]>([]);
+    // const [allTransactions, setAllTransactions] = useState<TransactionStructType[]>([]);
+    // const [allReviewLists, setAllReviewLists] = useState<NFTDataType[]>([]);
+    const { data } = useContractReads({
+        contracts: [
+            {
+                ...CONTRACT_CONFIG,
+                functionName: "getAllNFTs",
+            },
+            {
+                ...CONTRACT_CONFIG,
+                functionName: "getAllTransactions",
+            },
+            {
+                ...CONTRACT_CONFIG,
+                functionName: "getAllToBeReviewLists",
+            },
+        ],
+    });
+    const allNfts =
+        data && data[0] && data[0]?.result && data[0]?.status === "success"
+            ? (data[0]?.result as NFTDataType[])
+            : [];
+    const allTransactions =
+        data && data[1] && data[1]?.result && data[1]?.status === "success"
+            ? (data[1]?.result as TransactionStructType[])
+            : [];
+    const allReviewLists =
+        data && data[2] && data[2]?.result && data[2]?.status === "success"
+            ? (data[2]?.result as TransactionStructType[])
+            : [];
 
     console.log("allNfts:", allNfts);
     console.log("AllTransactions", allTransactions);
@@ -49,37 +78,37 @@ function App() {
         setRouter(route);
     };
 
-    const getContractData = async () => {
-        const data = await readContracts({
-            contracts: [
-                {
-                    ...CONTRACT_CONFIG,
-                    functionName: "artist",
-                },
-                {
-                    ...CONTRACT_CONFIG,
-                    functionName: "getAllNFTs",
-                },
-                {
-                    ...CONTRACT_CONFIG,
-                    functionName: "getAllTransactions",
-                },
-                {
-                    ...CONTRACT_CONFIG,
-                    functionName: "getAllToBeReviewLists",
-                },
-            ],
-        });
+    // const getContractData = async () => {
+    //     const data = await readContracts({
+    //         contracts: [
+    //             {
+    //                 ...CONTRACT_CONFIG,
+    //                 functionName: "artist",
+    //             },
+    //             {
+    //                 ...CONTRACT_CONFIG,
+    //                 functionName: "getAllNFTs",
+    //             },
+    //             {
+    //                 ...CONTRACT_CONFIG,
+    //                 functionName: "getAllTransactions",
+    //             },
+    //             {
+    //                 ...CONTRACT_CONFIG,
+    //                 functionName: "getAllToBeReviewLists",
+    //             },
+    //         ],
+    //     });
 
-        if (data[1].status === "success") setAllNfts(data[1].result as NFTDataType[]);
-        if (data[2].status === "success")
-            setAllTransactions(data[2].result as TransactionStructType[]);
-        if (data[3].status === "success") setAllReviewLists(data[3].result as NFTDataType[]);
-    };
+    //     if (data[1].status === "success") setAllNfts(data[1].result as NFTDataType[]);
+    //     if (data[2].status === "success")
+    //         setAllTransactions(data[2].result as TransactionStructType[]);
+    //     if (data[3].status === "success") setAllReviewLists(data[3].result as NFTDataType[]);
+    // };
 
-    useEffect(() => {
-        getContractData();
-    }, [count]);
+    // useEffect(() => {
+    //     getContractData();
+    // }, [count]);
 
     const reloadData = () => {
         setCount(count => count + 1);
