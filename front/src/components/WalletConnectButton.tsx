@@ -1,10 +1,13 @@
-import { useConnect, useAccount, useDisconnect } from "wagmi";
-import { InjectedConnector } from "@wagmi/core";
+import { useConnect, useAccount, useDisconnect, useNetwork } from "wagmi";
+import { InjectedConnector, switchNetwork } from "@wagmi/core";
 import { shortAddress } from "@/configs/utils";
 import useBalance from "@/hooks/useBalance";
+import { CHAIN_IDS } from "@/configs/configs";
 
 function WalletConnectButton() {
     const { address, isConnected } = useAccount();
+    const { chain } = useNetwork();
+    const currentChainId = chain?.id;
     const balance = useBalance();
 
     const { connect } = useConnect({
@@ -12,6 +15,31 @@ function WalletConnectButton() {
     });
 
     const { disconnect } = useDisconnect();
+
+    if (currentChainId && currentChainId !== CHAIN_IDS.BASE_GOERLI) {
+        return (
+            <>
+                <div
+                    className="daisy-tooltip daisy-tooltip-top"
+                    data-tip="We only support base-goerli now"
+                >
+                    <button
+                        className="daisy-btn daisy-btn-ghost"
+                        onClick={async () =>
+                            await switchNetwork({
+                                chainId: CHAIN_IDS.BASE_GOERLI,
+                            })
+                        }
+                    >
+                        Switch Network
+                    </button>
+                </div>
+                <button className="daisy-btn daisy-btn-ghost ml-2" onClick={() => disconnect()}>
+                    Disconnect
+                </button>
+            </>
+        );
+    }
 
     if (isConnected && address) {
         return (

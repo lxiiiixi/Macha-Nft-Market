@@ -1,9 +1,11 @@
-function Alert({ content }: { content: string }) {
+import { ReactNode } from "react";
+
+function Alert({ content }: { content: ReactNode }) {
     return (
         <div
             role="alert"
             className={`daisy-alert absolute bottom-6 left-6 w-fit max-w-[80%] ${
-                content.length !== 0 ? "alert-enter" : "alert-exit"
+                content ? "alert-enter" : "alert-exit"
             }`}
         >
             <svg

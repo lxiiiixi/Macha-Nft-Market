@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import ReviewTable from "../ReviewTable";
 import type { NFTDataType, AddressType } from "@/App";
 import { writeContract } from "@wagmi/core";
@@ -13,7 +13,7 @@ function ReviewPage({
 }: {
     reviewLists: NFTDataType[];
     address: AddressType | undefined;
-    setAlertContent: React.Dispatch<React.SetStateAction<string>>;
+    setAlertContent: React.Dispatch<React.SetStateAction<ReactNode>>;
     reloadData: () => void;
 }) {
     const isOwner = !!address && address === OWNER_ADDRESS;

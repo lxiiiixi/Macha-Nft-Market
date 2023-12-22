@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 
-function useAlert(timeout = 3000): [string, React.Dispatch<React.SetStateAction<string>>] {
-    const [alertContent, setAlertContent] = useState("");
+function useAlert(timeout = 4000): [ReactNode, React.Dispatch<React.SetStateAction<ReactNode>>] {
+    const [alertContent, setAlertContent] = useState<ReactNode>();
 
     useEffect(() => {
         if (alertContent) {

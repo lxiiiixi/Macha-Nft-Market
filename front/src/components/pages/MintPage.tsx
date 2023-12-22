@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, ReactNode } from "react";
 import { parseEther } from "viem";
 import { writeContract } from "@wagmi/core";
 import { CONTRACT_CONFIG, MINT_FEE, TRANSACTION_FEE, OWNER_ADDRESS } from "@/configs/configs";
@@ -10,7 +10,7 @@ function MintPage({
     setAlertContent,
 }: {
     reloadData: () => void;
-    setAlertContent: React.Dispatch<React.SetStateAction<string>>;
+    setAlertContent: React.Dispatch<React.SetStateAction<ReactNode>>;
 }) {
     const title = "MCDD Crocodile Macha";
     const [isSubmiting, setIsSubmiting] = useState(false);

@@ -9,3 +9,7 @@ export const CONTRACT_CONFIG = {
 };
 
 export const OWNER_ADDRESS = "0x037B83c8C7E8169565B8E14C03aeCF1855428de1";
+
+export const CHAIN_IDS = {
+    BASE_GOERLI: 84531,
+};
