@@ -1,6 +1,6 @@
 import { useState, ChangeEvent, ReactNode } from "react";
 import { parseEther } from "viem";
-import { writeContract } from "@wagmi/core";
+import { useContractWrite } from "wagmi";
 import { CONTRACT_CONFIG, MINT_FEE, TRANSACTION_FEE, OWNER_ADDRESS } from "@/configs/configs";
 import { useAccount } from "wagmi";
 import { IMGBB_API } from "@/configs/envs";
@@ -13,7 +13,6 @@ function MintPage({
     setAlertContent: React.Dispatch<React.SetStateAction<ReactNode>>;
 }) {
     const title = "MCDD Crocodile Macha";
-    const [isSubmiting, setIsSubmiting] = useState(false);
     const [price, setPrice] = useState("");
     const [description, setDescription] = useState("");
     const [metadataURI, setMetadataURI] = useState(""); // 最终上传的这个地址
@@ -21,6 +20,25 @@ function MintPage({
     const [imgBase64, setImgBase64] = useState<null | string>(null); // base64(display)
     const { address } = useAccount();
     const isOwner = !!address && address === OWNER_ADDRESS;
+    const {
+        data: data1,
+        isLoading: isLoading1,
+        write: writeSubmitTobeReviewedList,
+    } = useContractWrite({
+        ...CONTRACT_CONFIG,
+        functionName: "submitTobeReviewedList",
+        account: address,
+    });
+
+    const {
+        data: data2,
+        isLoading: isLoading2,
+        write: writeMintByOwner,
+    } = useContractWrite({
+        ...CONTRACT_CONFIG,
+        functionName: "mintByOwner",
+        account: address,
+    });
 
     const submitMintNFT = async (
         title: string,
@@ -28,15 +46,19 @@ function MintPage({
         metadataURI: string,
         salesPrice: bigint
     ) => {
-        const { hash } = await writeContract({
-            ...CONTRACT_CONFIG,
-            functionName: "submitTobeReviewedList",
+        writeSubmitTobeReviewedList({
             args: [title, description, metadataURI, salesPrice],
             value: parseEther(MINT_FEE) + parseEther(TRANSACTION_FEE), // mint 最少需要 0.001 eth
-            account: address,
         });
+        // const { hash } = await writeContract({
+        //     ...CONTRACT_CONFIG,
+        //     functionName: "submitTobeReviewedList",
+        //     args: [title, description, metadataURI, salesPrice],
+        //     value: parseEther(MINT_FEE) + parseEther(TRANSACTION_FEE), // mint 最少需要 0.001 eth
+        //     account: address,
+        // });
         reloadData();
-        setAlertContent("Success! Transaction hash: " + hash);
+        setAlertContent("Success!" + data1);
     };
 
     const mintByOwner = async (
@@ -45,15 +67,13 @@ function MintPage({
         metadataURI: string,
         salesPrice: bigint
     ) => {
-        const { hash } = await writeContract({
-            ...CONTRACT_CONFIG,
-            functionName: "mintByOwner",
+        writeMintByOwner({
             args: [title, description, metadataURI, salesPrice],
             value: parseEther(MINT_FEE),
-            account: address,
         });
         reloadData();
-        setAlertContent("Success! Transaction hash: " + hash);
+        setAlertContent("Success!" + data2);
+        // setAlertContent("Success! Transaction hash: " + hash);
     };
 
     const submitMint = () => {
@@ -62,13 +82,11 @@ function MintPage({
                 setAlertContent("Please fill in the complete information");
                 return;
             } else {
-                setIsSubmiting(true);
                 if (isOwner) {
                     mintByOwner(title, description, metadataURI, parseEther(price));
                 } else {
                     submitMintNFT(title, description, metadataURI, parseEther(price));
                 }
-                setIsSubmiting(false);
             }
         } else {
             setAlertContent("Please connect your wallet");
@@ -218,7 +236,7 @@ function MintPage({
                         }
                     >
                         <button className="daisy-btn daisy-btn-outline w-full" onClick={submitMint}>
-                            {isSubmiting ? (
+                            {isLoading1 || isLoading2 ? (
                                 <div className="relative">
                                     Submitting
                                     <span className="daisy-loading daisy-loading-dots daisy-loading-xs absolute -bottom-1 -right-5"></span>

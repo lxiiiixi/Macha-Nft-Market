@@ -1,7 +1,7 @@
 import React from "react";
 import NftCard from "@/components/common/NftCard";
 import type { NFTDataType, AddressType } from "@/App";
-import { writeContract } from "@wagmi/core";
+import { useContractWrite } from "wagmi";
 import { CONTRACT_CONFIG } from "@/configs/configs";
 import { parseEther } from "viem";
 
@@ -16,17 +16,19 @@ function ListedPage({
 }) {
     const [newPrice, setNewPrice] = React.useState("");
     const [changePriceNftInfo, setChangePriceNftInfo] = React.useState<NFTDataType | null>();
+    const { data, isLoading, write } = useContractWrite({
+        ...CONTRACT_CONFIG,
+        functionName: "changePrice",
+        account: address,
+    });
 
     const ifOwner = address && changePriceNftInfo?.owner && address === changePriceNftInfo.owner;
     const handleChangePrice = async () => {
         if (ifOwner) {
-            const { hash } = await writeContract({
-                ...CONTRACT_CONFIG,
-                functionName: "changePrice",
+            write({
                 args: [changePriceNftInfo.id, parseEther(newPrice)],
-                account: address,
             });
-            console.log(hash);
+            console.log(data);
             setNewPrice("");
             reloadData();
         }
@@ -42,7 +44,6 @@ function ListedPage({
                             data={nft}
                             address={address}
                             setChangePriceNftInfo={setChangePriceNftInfo}
-                            reloadData={reloadData}
                         />
                     </div>
                 ))}
@@ -71,7 +72,7 @@ function ListedPage({
                                 Close
                             </button>
                             <button className="daisy-btn w-[180px]" onClick={handleChangePrice}>
-                                Confirm
+                                {isLoading ? "Confirming..." : "Confirm"}
                             </button>
                         </form>
                     </div>

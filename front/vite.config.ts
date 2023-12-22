@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
             },
         },
         esbuild: {
-            drop: mode === "prod" ? ["console", "debugger"] : [],
+            drop: mode === "development" ? [] : ["console", "debugger"],
         },
     };
 });

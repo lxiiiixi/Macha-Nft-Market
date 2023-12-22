@@ -5,7 +5,7 @@ import { shortAddress, timestampToDate } from "@/configs/utils";
 import { CopyIcon, YesIcon } from "@/assets";
 import type { AddressType } from "@/App";
 import { CONTRACT_CONFIG } from "@/configs/configs";
-import { writeContract } from "@wagmi/core";
+import { useContractWrite } from "wagmi";
 import useBalance from "@/hooks/useBalance";
 
 function NftCard({
@@ -13,16 +13,19 @@ function NftCard({
     data,
     address,
     setChangePriceNftInfo,
-    reloadData,
 }: {
     isHome: boolean; // apart the home page
     data: NFTDataType;
     address: AddressType | undefined;
     setChangePriceNftInfo?: React.Dispatch<React.SetStateAction<NFTDataType | undefined | null>>;
-    reloadData?: () => void;
 }) {
     const [copyIcon, setCopyIcon] = React.useState(CopyIcon);
     const balance = useBalance();
+    const { isLoading, write } = useContractWrite({
+        ...CONTRACT_CONFIG,
+        functionName: "payToBuy",
+        account: address,
+    });
 
     React.useEffect(() => {
         if (copyIcon === CopyIcon) return;
@@ -35,17 +38,22 @@ function NftCard({
     const { cost, id, description, metadataURI, owner, timestamp, title } = data;
     const ifOwner = address && address === owner;
 
-    const handlePayToBuy = async () => {
+    const handlePayToBuy = () => {
         if (!ifOwner) {
-            const { hash } = await writeContract({
-                ...CONTRACT_CONFIG,
-                functionName: "payToBuy",
+            write({
                 args: [id],
                 value: cost,
-                account: address,
             });
-            console.log(hash);
-            reloadData && reloadData();
+
+            // const { hash } = await writeContract({
+            //     ...CONTRACT_CONFIG,
+            //     functionName: "payToBuy",
+            //     args: [id],
+            //     value: cost,
+            //     account: address,
+            // });
+            // console.log(hash);
+            // reloadData && reloadData();
         }
     };
 
@@ -90,9 +98,9 @@ function NftCard({
                                     ifOwner ? "cursor-not-allowed" : ""
                                 }`}
                                 onClick={handlePayToBuy}
-                                disabled={checkBuyButton() !== true}
+                                disabled={checkBuyButton() !== true || isLoading}
                             >
-                                Buy Now
+                                {isLoading ? "Pay..." : "Buy Now"}
                             </button>
                         </div>
                     )}

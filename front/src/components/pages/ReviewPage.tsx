@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import ReviewTable from "../ReviewTable";
 import type { NFTDataType, AddressType } from "@/App";
-import { writeContract } from "@wagmi/core";
+import { useContractWrite } from "wagmi";
 import { OWNER_ADDRESS } from "@/configs/configs";
 import { CONTRACT_CONFIG } from "@/configs/configs";
 
@@ -17,17 +17,35 @@ function ReviewPage({
     reloadData: () => void;
 }) {
     const isOwner = !!address && address === OWNER_ADDRESS;
+    const { data: data1, write: writeExecuteMintByOwner } = useContractWrite({
+        ...CONTRACT_CONFIG,
+        functionName: "executeMintByOwner",
+        account: address,
+    });
+    const { data: data2, write: writeRemoveReviewedListByIndex } = useContractWrite({
+        ...CONTRACT_CONFIG,
+        functionName: "removeReviewedListByIndex",
+        account: address,
+    });
+    const { data: data3, write: writeRemoveMultipleReviewedListByindices } = useContractWrite({
+        ...CONTRACT_CONFIG,
+        functionName: "removeMultipleReviewedListByindices",
+        account: address,
+    });
 
     const executeMintByOwner = async (id: bigint[], metadataURI: string[]) => {
         if (address) {
-            const { hash } = await writeContract({
-                ...CONTRACT_CONFIG,
-                functionName: "executeMintByOwner",
+            // const { hash } = await writeContract({
+            //     ...CONTRACT_CONFIG,
+            //     functionName: "executeMintByOwner",
+            //     args: [id, metadataURI],
+            //     account: address,
+            // });
+            // reloadData();
+            writeExecuteMintByOwner({
                 args: [id, metadataURI],
-                account: address,
             });
-            reloadData();
-            setAlertContent("Success! Transaction hash: " + hash);
+            setAlertContent("Success! " + data1);
         } else {
             setAlertContent("Please connect your wallet");
         }
@@ -35,14 +53,17 @@ function ReviewPage({
 
     const removeReviewedListByIndex = async (id: bigint, metadataURI: string) => {
         if (address) {
-            const { hash } = await writeContract({
-                ...CONTRACT_CONFIG,
-                functionName: "removeReviewedListByIndex",
+            writeRemoveReviewedListByIndex({
                 args: [id, metadataURI],
-                account: address,
             });
-            reloadData();
-            setAlertContent("Success! Transaction hash: " + hash);
+            // const { hash } = await writeContract({
+            //     ...CONTRACT_CONFIG,
+            //     functionName: "removeReviewedListByIndex",
+            //     args: [id, metadataURI],
+            //     account: address,
+            // });
+            // reloadData();
+            setAlertContent("Success!" + data2);
         } else {
             setAlertContent("Please connect your wallet");
         }
@@ -50,14 +71,17 @@ function ReviewPage({
 
     const removeMultipleReviewedListByindices = async (id: bigint[], metadataURI: string[]) => {
         if (address) {
-            const { hash } = await writeContract({
-                ...CONTRACT_CONFIG,
-                functionName: "removeMultipleReviewedListByindices",
+            // const { hash } = await writeContract({
+            //     ...CONTRACT_CONFIG,
+            //     functionName: "removeMultipleReviewedListByindices",
+            //     args: [id, metadataURI],
+            //     account: address,
+            // });
+            writeRemoveMultipleReviewedListByindices({
                 args: [id, metadataURI],
-                account: address,
             });
             reloadData();
-            setAlertContent("Success! Transaction hash: " + hash);
+            setAlertContent("Success! Transaction hash: " + data3);
         } else {
             setAlertContent("Please connect your wallet");
         }

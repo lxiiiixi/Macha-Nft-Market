@@ -19,7 +19,9 @@ function useBalance(): FetchBalanceResult | undefined {
             }
         };
 
-        getBalance();
+        if (address) {
+            getBalance();
+        }
     }, [address]);
 
     return balance;
