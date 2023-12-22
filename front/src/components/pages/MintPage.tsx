@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, ReactNode } from "react";
+import { useState, ChangeEvent, ReactNode, useEffect } from "react";
 import { parseEther } from "viem";
 import { useContractWrite } from "wagmi";
 import { CONTRACT_CONFIG, MINT_FEE, TRANSACTION_FEE, OWNER_ADDRESS } from "@/configs/configs";
@@ -21,6 +21,7 @@ function MintPage({
     const {
         data: data1,
         isLoading: isLoading1,
+        isSuccess: isSuccess1,
         write: writeSubmitTobeReviewedList,
     } = useContractWrite({
         ...CONTRACT_CONFIG,
@@ -31,12 +32,22 @@ function MintPage({
     const {
         data: data2,
         isLoading: isLoading2,
+        isSuccess: isSuccess2,
         write: writeMintByOwner,
     } = useContractWrite({
         ...CONTRACT_CONFIG,
         functionName: "mintByOwner",
         account: address,
     });
+
+    useEffect(() => {
+        if (isSuccess1 && data1) {
+            setAlertContent("Success!" + data1);
+        }
+        if (isSuccess2 && data2) {
+            setAlertContent("Success!" + data2);
+        }
+    }, [isSuccess1, data1, isSuccess2, data2, setAlertContent]);
 
     const submitMintNFT = async (
         title: string,
@@ -48,14 +59,6 @@ function MintPage({
             args: [title, description, metadataURI, salesPrice],
             value: parseEther(MINT_FEE) + parseEther(TRANSACTION_FEE), // mint 最少需要 0.001 eth
         });
-        // const { hash } = await writeContract({
-        //     ...CONTRACT_CONFIG,
-        //     functionName: "submitTobeReviewedList",
-        //     args: [title, description, metadataURI, salesPrice],
-        //     value: parseEther(MINT_FEE) + parseEther(TRANSACTION_FEE), // mint 最少需要 0.001 eth
-        //     account: address,
-        // });
-        setAlertContent("Success!" + data1);
     };
 
     const mintByOwner = async (

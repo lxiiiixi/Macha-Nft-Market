@@ -1,8 +1,5 @@
-// import reactLogo from "./assets/react.svg";
-// import viteLogo from "/vite.svg";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAccount } from "wagmi";
-import { readContracts } from "@wagmi/core";
 import { CONTRACT_CONFIG } from "@/configs/configs";
 import Navbar from "@/components/Navbar.tsx";
 import HomePage from "@/components/pages/HomePage";
@@ -35,7 +32,6 @@ export type TransactionStructType = {
 
 function App() {
     const { address } = useAccount();
-    const [count, setCount] = useState(0);
     const [route, setRouter] = useState<RouteType>("HOME");
     const [alertContent, setAlertContent] = useAlert();
     // const [allNfts, setAllNfts] = useState<NFTDataType[]>([]);
@@ -67,7 +63,7 @@ function App() {
             : [];
     const allReviewLists =
         data && data[2] && data[2]?.result && data[2]?.status === "success"
-            ? (data[2]?.result as TransactionStructType[])
+            ? (data[2]?.result as NFTDataType[])
             : [];
 
     console.log("allNfts:", allNfts);
@@ -76,42 +72,6 @@ function App() {
 
     const switchRoute = (route: RouteType) => {
         setRouter(route);
-    };
-
-    // const getContractData = async () => {
-    //     const data = await readContracts({
-    //         contracts: [
-    //             {
-    //                 ...CONTRACT_CONFIG,
-    //                 functionName: "artist",
-    //             },
-    //             {
-    //                 ...CONTRACT_CONFIG,
-    //                 functionName: "getAllNFTs",
-    //             },
-    //             {
-    //                 ...CONTRACT_CONFIG,
-    //                 functionName: "getAllTransactions",
-    //             },
-    //             {
-    //                 ...CONTRACT_CONFIG,
-    //                 functionName: "getAllToBeReviewLists",
-    //             },
-    //         ],
-    //     });
-
-    //     if (data[1].status === "success") setAllNfts(data[1].result as NFTDataType[]);
-    //     if (data[2].status === "success")
-    //         setAllTransactions(data[2].result as TransactionStructType[]);
-    //     if (data[3].status === "success") setAllReviewLists(data[3].result as NFTDataType[]);
-    // };
-
-    // useEffect(() => {
-    //     getContractData();
-    // }, [count]);
-
-    const reloadData = () => {
-        setCount(count => count + 1);
     };
 
     return (
@@ -127,20 +87,15 @@ function App() {
                         switchRoute={switchRoute}
                     />
                 )}
-                {route === "MINT" && (
-                    <MintPage reloadData={reloadData} setAlertContent={setAlertContent} />
-                )}
+                {route === "MINT" && <MintPage setAlertContent={setAlertContent} />}
                 {route === "REVIEW" && (
                     <ReviewPage
                         reviewLists={allReviewLists}
                         address={address}
                         setAlertContent={setAlertContent}
-                        reloadData={reloadData}
                     />
                 )}
-                {route === "LISTED" && (
-                    <ListedPage allNfts={allNfts} address={address} reloadData={reloadData} />
-                )}
+                {route === "LISTED" && <ListedPage allNfts={allNfts} address={address} />}
             </div>
             <Alert content={alertContent} />
         </>

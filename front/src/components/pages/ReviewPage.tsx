@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import ReviewTable from "../ReviewTable";
 import type { NFTDataType, AddressType } from "@/App";
 import { useContractWrite } from "wagmi";
@@ -31,6 +31,18 @@ function ReviewPage({
         account: address,
     });
 
+    useEffect(() => {
+        if (data1) {
+            setAlertContent("Success! " + data1);
+        }
+        if (data2) {
+            setAlertContent("Success! " + data2);
+        }
+        if (data3) {
+            setAlertContent("Success! " + data3);
+        }
+    }, [data1, data2, data3, setAlertContent]);
+
     const executeMintByOwner = async (id: bigint[], metadataURI: string[]) => {
         if (address) {
             // const { hash } = await writeContract({
@@ -43,7 +55,6 @@ function ReviewPage({
             writeExecuteMintByOwner({
                 args: [id, metadataURI],
             });
-            setAlertContent("Success! " + data1);
         } else {
             setAlertContent("Please connect your wallet");
         }
@@ -61,7 +72,6 @@ function ReviewPage({
             //     account: address,
             // });
             // reloadData();
-            setAlertContent("Success!" + data2);
         } else {
             setAlertContent("Please connect your wallet");
         }
@@ -78,7 +88,6 @@ function ReviewPage({
             writeRemoveMultipleReviewedListByindices({
                 args: [id, metadataURI],
             });
-            setAlertContent("Success! Transaction hash: " + data3);
         } else {
             setAlertContent("Please connect your wallet");
         }
