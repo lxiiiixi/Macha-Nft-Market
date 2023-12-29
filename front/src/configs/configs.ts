@@ -4,7 +4,7 @@ import type { Abi } from "viem";
 export const MINT_FEE = "0.01";
 export const TRANSACTION_FEE = "0.001";
 export const CONTRACT_CONFIG = {
-    address: "0x28A809048924ec75Aa659634C254D499555F9582" as `0x${string}`,
+    address: "0x342A91f61cE87aFC47413d8FB96aF85C8B959d22" as `0x${string}`,
     abi: timeless as Abi,
 };
 
